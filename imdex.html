@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday, Amanda</title>
+<style>
+/* Fresh palette, distinct from any prior card:
+   deep teal night + coral/yellow accents — playful, not solemn */
+:root{
+  --teal:#123138;
+  --teal-2:#1c4a52;
+  --coral:#ff6b5b;
+  --yellow:#ffd166;
+  --cream:#fbf3e7;
+  --ink:#0d2327;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:radial-gradient(140% 100% at 50% 0%, var(--teal-2), var(--teal) 65%);
+  color:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;padding:1.25rem;
+}
+
+.card{width:min(30rem,100%);text-align:center;position:relative}
+
+.front{
+  background:linear-gradient(165deg, #1e4a52, var(--teal));
+  border:1px solid rgba(255,209,102,.3);
+  border-radius:1.25rem;
+  padding:3.5rem 2rem;
+  box-shadow:0 24px 60px rgba(0,0,0,.4);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.front .to{
+  font-size:.8rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--coral);margin-bottom:1rem;font-weight:700;
+}
+.front h1{
+  font-weight:800;font-size:clamp(1.9rem,6.5vw,2.8rem);
+  line-height:1.15;margin-bottom:2rem;letter-spacing:-.01em;
+}
+
+/* ---------- signature element: the sound wave ----------
+   Loud/jagged on the front. On open, bars settle down to a
+   single calm line — the message's own joke, animated. */
+.wave{
+  display:flex;align-items:flex-end;justify-content:center;
+  gap:6px;height:70px;margin:0 auto 2.25rem;
+}
+.wave span{
+  display:block;width:8px;border-radius:4px;
+  background:var(--yellow);
+  animation:bounce 1.1s ease-in-out infinite;
+}
+.wave span:nth-child(1){height:22px;animation-delay:.0s}
+.wave span:nth-child(2){height:52px;animation-delay:.1s;background:var(--coral)}
+.wave span:nth-child(3){height:34px;animation-delay:.2s}
+.wave span:nth-child(4){height:64px;animation-delay:.05s;background:var(--coral)}
+.wave span:nth-child(5){height:28px;animation-delay:.25s}
+.wave span:nth-child(6){height:58px;animation-delay:.15s;background:var(--coral)}
+.wave span:nth-child(7){height:20px;animation-delay:.3s}
+@keyframes bounce{
+  0%,100%{transform:scaleY(1)}
+  50%{transform:scaleY(.4)}
+}
+
+button.open{
+  font:inherit;font-size:1rem;font-weight:700;letter-spacing:.04em;
+  background:var(--coral);color:var(--cream);
+  border:0;border-radius:2rem;
+  padding:.85rem 2.2rem;cursor:pointer;
+  box-shadow:0 0 24px rgba(255,107,91,.4);
+}
+button.open:hover{background:#ff8674}
+button.open:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+
+/* ---------- inside ---------- */
+.inside{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:2rem;
+  opacity:0;visibility:hidden;
+  transition:opacity .9s ease .4s, visibility 0s 1.3s;
+}
+.calm-wave span{
+  display:block;width:8px;height:4px;border-radius:2px;
+  background:var(--yellow);margin:0 auto;
+}
+.inside .calm-wave{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  height:70px;margin-bottom:1.75rem;
+}
+.inside p{
+  font-size:clamp(1.1rem,4vw,1.4rem);line-height:1.7;
+  max-width:26ch;
+  opacity:0;transform:translateY(14px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.inside .wish{transition-delay:.7s}
+.inside .msg{transition-delay:1.3s;margin-top:1.1rem}
+.inside .sign{
+  transition-delay:1.9s;margin-top:2rem;
+  color:var(--coral);font-weight:700;font-size:1.1rem;
+}
+
+.card.opened .front{opacity:0;transform:translateY(-20px) scale(.97);pointer-events:none}
+.card.opened .wave span{animation-play-state:paused}
+.card.opened .inside{opacity:1;visibility:visible}
+.card.opened .inside p{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .wave span{animation:none;transform:none}
+  .front,.inside,.inside p{transition:none}
+}
+</style>
+</head>
+<body>
+
+<main class="card" id="card">
+  <div class="front">
+    <p class="to">For Amanda Kennison</p>
+    <h1>Happy Birthday</h1>
+    <div class="wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <button class="open" id="open-btn">Open your card</button>
+  </div>
+
+  <div class="inside" id="inside" aria-hidden="true">
+    <div class="calm-wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p class="wish">Happy birthday, Amanda!</p>
+    <p class="msg">Thank you for putting up with all the noise I make.<br>
+      I promise to talk to myself less.</p>
+    <p class="sign">&mdash; PSG</p>
+  </div>
+</main>
+
+<script>
+(function(){
+  var card   = document.getElementById('card');
+  var btn    = document.getElementById('open-btn');
+  var inside = document.getElementById('inside');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function open(){
+    card.classList.add('opened');
+    inside.setAttribute('aria-hidden','false');
+    inside.setAttribute('tabindex','-1');
+    inside.focus({preventScroll:true});
+  }
+
+  btn.addEventListener('click', open);
+  if(reduce){ open(); }
+})();
+</script>
+
+</body>
+</html>
